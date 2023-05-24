@@ -20,6 +20,7 @@ import diarsid.console.api.io.Command;
 import diarsid.console.api.io.ConsolePlatform;
 import diarsid.console.api.io.operations.Operation;
 import diarsid.console.api.io.operations.OperationBuilder;
+import diarsid.console.api.io.operations.OperationLogic;
 import diarsid.console.impl.CommandParser;
 import diarsid.console.impl.ConsoleImpl;
 import diarsid.console.impl.ConsolePlatforms;
@@ -35,6 +36,8 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+
+import static diarsid.console.impl.OperationsChain.DEFAULT_OPERATION_NAME;
 
 public class ConsoleBuilding {
 
@@ -83,6 +86,16 @@ public class ConsoleBuilding {
     public ConsoleBuilding withOperation(Consumer<OperationBuilder> builderLogic) {
         OperationBuilderImpl builder = new OperationBuilderImpl();
         builderLogic.accept(builder);
+        this.operationBuilders.add(builder);
+        return this;
+    }
+
+    public ConsoleBuilding withDefaultOperation(OperationLogic defaultOperationLogic) {
+        OperationBuilderImpl builder = new OperationBuilderImpl();
+        builder
+                .named(DEFAULT_OPERATION_NAME)
+                .doing(defaultOperationLogic)
+                .matching(command -> true);
         this.operationBuilders.add(builder);
         return this;
     }

@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import diarsid.console.api.io.Command;
-import diarsid.support.objects.Either;
+import diarsid.support.objects.references.Either;
 import diarsid.support.strings.StringUtils;
 
 import static java.lang.String.format;
@@ -127,10 +127,10 @@ public class CommandParser {
         }
 
         if ( ! problems.isEmpty() ) {
-            return Either.rightOfEither(problems);
+            return Either.withSecondary(problems);
         }
 
-        return Either.leftOfEither(new CommandImpl(line, args, flagValues));
+        return Either.withPrimary(new CommandImpl(line, args, flagValues));
     }
 
     private Supplier<IllegalArgumentException> noFlagOfName(String flagName) {

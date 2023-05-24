@@ -14,13 +14,14 @@ import diarsid.console.api.io.Output;
 import diarsid.console.impl.building.ConsoleBuilding;
 import diarsid.console.impl.io.ExceptionHandler;
 import diarsid.console.impl.io.OutputImpl;
-import diarsid.support.objects.Either;
+import diarsid.support.objects.references.Either;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
-import static diarsid.support.objects.Either.Side.LEFT;
+import static diarsid.support.objects.references.Either.Presence.PRIMARY;
 
 public class ConsoleImpl implements Console, Life {
 
@@ -113,8 +114,8 @@ public class ConsoleImpl implements Console, Life {
                         }
 
                         Either<Command, List<String>> parsing = this.parser.parse(input);
-                        if ( parsing.side.equalTo(LEFT) ) {
-                            command = parsing.left;
+                        if ( parsing.presence().is(PRIMARY) ) {
+                            command = parsing.orThrow();
                             List<String> answer = this.operationsChain.process(consolePlatform, command);
                             this.output.acceptProcessingAnswer(answer);
                             for (String line : answer) {
@@ -123,7 +124,7 @@ public class ConsoleImpl implements Console, Life {
                         }
                         else {
                             consolePlatform.println(this.format.spanBetweenLineStartAndOutput() + "Command is not valid: ");
-                            for ( String line : parsing.right ) {
+                            for ( String line : parsing.secondaryOrThrow() ) {
                                 consolePlatform.println(this.format.spanBetweenLineStartAndOutput() + line);
                             }
                         }

@@ -30,11 +30,6 @@ public class CommandImpl implements Command {
     }
 
     @Override
-    public String argAt(int i) {
-        return args.get(i);
-    }
-
-    @Override
     public List<String> args() {
         return args;
     }

@@ -50,7 +50,21 @@ public interface Command {
 
     String raw();
 
-    String argAt(int i);
+    default String argAt(int i) {
+        var args = this.args();
+
+        boolean noValue =
+                args.size() <= i ||
+                args.isEmpty() ||
+                i < 0;
+
+        if ( noValue ) {
+            return "";
+        }
+        else {
+            return args.get(i);
+        }
+    }
 
     List<String> args();
 
@@ -65,4 +79,12 @@ public interface Command {
     Optional<String> valueOf(Flag flag);
 
     List<String> valuesOf(Flag flag);
+
+    default boolean firstArgIs(String s) {
+        return this.argAt(0).equals(s);
+    }
+
+    default boolean hasArgs(int size) {
+        return this.args().size() == size;
+    }
 }

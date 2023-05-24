@@ -1,16 +1,16 @@
 package diarsid.console.impl;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import org.junit.jupiter.api.Test;
 
 import diarsid.console.api.io.Command;
-import diarsid.support.objects.Either;
-import org.junit.jupiter.api.Test;
+import diarsid.support.objects.references.Either;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import static diarsid.console.api.io.Command.Flag.Type.NO_VALUE;
 import static diarsid.console.api.io.Command.Flag.Type.OPEN_VALUE;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommandParserTest {
 
@@ -25,9 +25,9 @@ public class CommandParserTest {
 
         Either<Command, List<String>> parsing = parser
                 .parse("arg0 arg1 --novalue -nv arg2 -ov OPEN -ov OPEN_2 -rv TWO arg3 -rv ONE");
-        assertThat(parsing.side).isEqualTo(Either.Side.LEFT);
+        assertThat(parsing.presence()).isEqualTo(Either.Presence.PRIMARY);
 
-        Command command = parsing.left;
+        Command command = parsing.orThrow();
 
         assertThat(command.has(noValue)).isTrue();
         assertThat(command.has(openValue)).isTrue();
@@ -38,5 +38,9 @@ public class CommandParserTest {
         assertThat(command.valuesOf(rValue)).containsExactly("TWO", "ONE");
         assertThat(command.args()).containsExactly("arg0", "arg1", "arg2", "arg3");
         assertThat(command.raw()).isEqualTo("arg0 arg1 --novalue -nv arg2 -ov OPEN -ov OPEN_2 -rv TWO arg3 -rv ONE");
+
+        String s = command.argAt(0);
+        String s1 = command.argAt(-1);
+        String s2 = command.argAt(20);
     }
 }
