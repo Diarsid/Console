@@ -15,7 +15,8 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 import static diarsid.console.api.io.Command.Flag.Type.NO_VALUE;
-import static diarsid.console.api.io.Command.Flag.Type.RESTRICTED_VALUE;
+import static diarsid.console.api.io.Command.Flag.Type.ALLOWED_VALUE;
+import static diarsid.console.api.io.Command.Flag.Type.VALIDATED_VALUE;
 
 public class CommandParser {
 
@@ -76,11 +77,22 @@ public class CommandParser {
                 else {
                     if ( valueAsSubstring ) {
                         flagValue = part.substring(separator + 1);
-                        if ( flag.type().equalTo(RESTRICTED_VALUE) ) {
-                            if ( ! flag.restrictingValues().contains(flagValue) ) {
+                        if ( flag.type().equalTo(ALLOWED_VALUE) ) {
+                            if ( ! flag.allowedValues().contains(flagValue) ) {
                                 problems.add(format("Flag '%s' accepts only values: %s",
                                         flag.name(),
-                                        String.join(", ", flag.restrictingValues())));
+                                        String.join(", ", flag.allowedValues())));
+                            }
+                        }
+                        else if ( flag.type().equalTo(VALIDATED_VALUE) ) {
+                            try {
+                                flag.validator().validate(flagValue);
+                            }
+                            catch (IllegalArgumentException e) {
+                                problems.add(format("Flag '%s' value cannot be '%s' - %s",
+                                        flag.name(),
+                                        flagValue,
+                                        e.getMessage()));
                             }
                         }
 
@@ -96,11 +108,22 @@ public class CommandParser {
                     }
                     else if ( i < last ) {
                         flagValue = parts[i + 1];
-                        if ( flag.type().equalTo(RESTRICTED_VALUE) ) {
-                            if ( ! flag.restrictingValues().contains(flagValue) ) {
+                        if ( flag.type().equalTo(ALLOWED_VALUE) ) {
+                            if ( ! flag.allowedValues().contains(flagValue) ) {
                                 problems.add(format("Flag '%s' accepts only values: %s",
                                         flag.name(),
-                                        String.join(", ", flag.restrictingValues())));
+                                        String.join(", ", flag.allowedValues())));
+                            }
+                        }
+                        else if ( flag.type().equalTo(VALIDATED_VALUE) ) {
+                            try {
+                                flag.validator().validate(flagValue);
+                            }
+                            catch (IllegalArgumentException e) {
+                                problems.add(format("Flag '%s' value cannot be '%s' - %s",
+                                        flag.name(),
+                                        flagValue,
+                                        e.getMessage()));
                             }
                         }
 

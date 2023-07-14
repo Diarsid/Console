@@ -14,6 +14,7 @@ import diarsid.console.api.io.operations.OperationLogic;
 import diarsid.console.impl.FlagImpl;
 import diarsid.console.impl.building.ConsoleBuilding;
 
+import static java.lang.String.format;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
 import static diarsid.console.api.format.ConsoleFormatElement.NAME;
@@ -82,6 +83,18 @@ public class Main {
                         .doing(echo))
 //                .withDefaultProcessing()
                 .withFlag(new FlagImpl(OPEN_VALUE, "flag", "f", true))
+                .withFlag(Command.Flag.withValidatedValues(
+                        "uuid",
+                        "u",
+                        false,
+                        (s) -> {
+                            try {
+                                UUID.fromString(s);
+                            }
+                            catch (Throwable t) {
+                                throw new IllegalArgumentException(format("%s is not an uuid!", s));
+                            }
+                        }))
                 .stopWhenInputIs("exit")
                 .enableExitConfirmation("y", "+", "yes")
                 .done();

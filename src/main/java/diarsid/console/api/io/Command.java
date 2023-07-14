@@ -17,7 +17,8 @@ public interface Command {
         enum Type implements CommonEnum<Type> {
             NO_VALUE,
             OPEN_VALUE,
-            RESTRICTED_VALUE
+            ALLOWED_VALUE,
+            VALIDATED_VALUE;
         }
 
         String name();
@@ -32,18 +33,29 @@ public interface Command {
             return ! this.isRepeatable();
         }
 
-        List<String> restrictingValues();
+        List<String> allowedValues();
 
-        static Flag noValue(String name, String shortName) {
+        Validator validator();
+
+        static Flag withNoValue(String name, String shortName) {
             return new FlagImpl(NO_VALUE, name, shortName, false);
         }
 
-        static Flag openValue(String name, String shortName, boolean repeatable) {
+        static Flag withAnyValues(String name, String shortName, boolean repeatable) {
             return new FlagImpl(OPEN_VALUE, name, shortName, repeatable);
         }
 
-        static Flag restrictingValues(String name, String shortName, boolean repeatable, String... values) {
+        static Flag withAllowedValues(String name, String shortName, boolean repeatable, String... values) {
             return new FlagImpl(name, shortName, repeatable, values);
+        }
+
+        static Flag withValidatedValues(String name, String shortName, boolean repeatable, Validator validator) {
+            return new FlagImpl(name, shortName, repeatable, validator);
+        }
+
+        interface Validator {
+
+            void validate(String value) throws IllegalArgumentException;
         }
 
     }
